@@ -9,7 +9,7 @@ import time
 import sys
 from Environment import Environment
 from Level import Level
-from solution import bfs_solver
+from solution import bfs_solver, print_stats, format_solution
 from solution import Astar
 
 def drawLevel(matrix_to_draw):
@@ -407,45 +407,37 @@ while True:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_LEFT:
-                movePlayer("L",myLevel)
+                movePlayer("L", myLevel)
             elif event.key == pygame.K_RIGHT:
-                movePlayer("R",myLevel)
+                movePlayer("R", myLevel)
             elif event.key == pygame.K_DOWN:
-                movePlayer("D",myLevel)
+                movePlayer("D", myLevel)
             elif event.key == pygame.K_UP:
-                movePlayer("U",myLevel)
+                movePlayer("U", myLevel)
             elif event.key == pygame.K_u:
                 drawLevel(myLevel.getLastMatrix())
             elif event.key == pygame.K_r:
-                initLevel(level_set,current_level)
+                initLevel(level_set, current_level)
             elif event.key == pygame.K_b:
+                # Run BFS auto-solver and play moves if found
                 walls, goals, player, boxes = get_level_state(myLevel)
-                solution = bfs_solver(walls, goals, player, boxes)
-                print("Auto-solution:", solution)
+                solution, stats = bfs_solver(walls, goals, player, boxes)
+                print_stats(stats, "BFS")
                 if solution:
+                    print("Auto-solution:", format_solution(solution))
                     for move in solution:
                         movePlayer(move, myLevel)
-                        pygame.time.wait(300)  # delay 0.3s mỗi bước
+                        pygame.time.wait(100)
             elif event.key == pygame.K_s:
+                # Run A* auto-solver and play moves if found
                 walls, goals, player, boxes = get_level_state(myLevel)
-                solution = Astar(walls, goals, player, boxes)
-                print("Auto-solution:", solution)
-             
-                # Nếu muốn tự động thực hiện lời giải:
+                solution, stats = Astar(walls, goals, player, boxes)
+                print_stats(stats, "A*")
                 if solution:
+                    print("Auto-solution:", format_solution(solution))
                     for move in solution:
                         movePlayer(move, myLevel)
-                        pygame.time.wait(300)  # delay 0.3s mỗi bước
-            # elif event.key == pygame.K_b:
-            #     walls, goals, player, boxes = get_level_state(myLevel)
-            #     solution = Astar(walls, goals, player, boxes)
-            #     print("Auto-solution:", solution)
-
-            #     # Nếu muốn tự động thực hiện lời giải:
-            #     if solution:
-            #         for move in solution:
-            #             movePlayer(move, myLevel)
-            #             pygame.time.wait(300)  # delay 0.3s mỗi bước
+                        pygame.time.wait(100)
             elif event.key == pygame.K_ESCAPE:
                 pygame.quit()
                 sys.exit()
